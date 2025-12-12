@@ -16,7 +16,7 @@ const FALLBACK_CATEGORIES = [
   "Famous Divine 9",
   "African Geography",
   "Thanksgiving",
-  "Black Music Artists"
+  "Black Music Artists",
 ];
 
 Object.entries(globResult).forEach(([path, mod]) => {
