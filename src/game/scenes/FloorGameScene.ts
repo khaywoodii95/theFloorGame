@@ -348,7 +348,7 @@ export class FloorGameScene extends Phaser.Scene {
       `Click an adjacent enemy tile to challenge. Category will use defender's (${owner.category}) or challenger’s choice.`
     );
 
-    const targets = key ? this.getEnemyNeighborKeys(key) : [];
+    const targets = owner ? this.getEnemyNeighborsForPlayer(owner.id) : [];
     this.neighborTargets = new Set(targets);
     targets.forEach((t) => this.highlightNeighbor(t));
   }
@@ -399,6 +399,7 @@ export class FloorGameScene extends Phaser.Scene {
 
     const roundCategory = this.nextForcedCategory ?? defender.category;
     this.nextForcedCategory = null;
+    this.battleSeriesManager.recordCategoryPlayed(roundCategory);
 
     this.battleController.startBattle(attackerTile, defenderTile, roundCategory);
   }
@@ -545,6 +546,25 @@ export class FloorGameScene extends Phaser.Scene {
       const owner = this.players.get(neighbor.ownerId);
       return !!owner?.alive;
     });
+  }
+
+  private getEnemyNeighborsForPlayer(playerId: number): string[] {
+    const player = this.players.get(playerId);
+    if (!player) return [];
+    const seen = new Set<string>();
+    player.tiles.forEach((key) => {
+      const tile = this.tiles.get(key);
+      if (!tile) return;
+      const neighborKeys = this.getNeighborKeys(tile.row, tile.col);
+      neighborKeys.forEach((nKey) => {
+        const neighbor = this.tiles.get(nKey);
+        if (!neighbor || neighbor.ownerId === null || neighbor.ownerId === playerId) return;
+        const owner = this.players.get(neighbor.ownerId);
+        if (!owner?.alive) return;
+        seen.add(nKey);
+      });
+    });
+    return Array.from(seen);
   }
 
   private getNeighborKeys(row: number, col: number): string[] {

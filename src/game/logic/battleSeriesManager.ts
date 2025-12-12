@@ -14,6 +14,7 @@ export class BattleSeriesManager {
     defenderId: number | null;
   }) | null = null;
   private pickRandomCategory: (exclude?: string[]) => string;
+  private playedCategories: Set<string> = new Set();
 
   constructor(pickRandomCategory: (exclude?: string[]) => string) {
     this.pickRandomCategory = pickRandomCategory;
@@ -21,6 +22,7 @@ export class BattleSeriesManager {
 
   reset() {
     this.series = null;
+    this.playedCategories.clear();
   }
 
   isActive(): boolean {
@@ -90,8 +92,10 @@ export class BattleSeriesManager {
         attackerId = defenderId;
         defId = challengerId;
       }
-      const exclude = [challenger?.category, defender?.category].filter(Boolean) as string[];
-      category = this.pickRandomCategory(exclude);
+      const excludeSet = new Set<string>(this.playedCategories);
+      if (challenger?.category) excludeSet.add(challenger.category);
+      if (defender?.category) excludeSet.add(defender.category);
+      category = this.pickRandomCategory(Array.from(excludeSet));
     }
 
     return { attackerId, defenderId: defId, category, stage: this.series.stage };
@@ -127,5 +131,10 @@ export class BattleSeriesManager {
       status: `${winner.name} wins this round. Series score ${winnerScore}-${loserScore}.`,
       hint: `Next battle uses the ${hintStage} category. Press Start Next Round to continue.`,
     };
+  }
+
+  recordCategoryPlayed(category: string) {
+    if (!category) return;
+    this.playedCategories.add(category);
   }
 }
