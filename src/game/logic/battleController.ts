@@ -170,6 +170,7 @@ export class BattleController {
       this.setCorrectButtonsInteractive(true);
       this.setPassButtonState(true);
       this.showNextCategoryImage();
+      this.deps.categoryImages.showPreviousName(650);
     }
     const playerName =
       side === "attacker"
@@ -249,16 +250,12 @@ export class BattleController {
     this.deps.playTone(180, 200, 0.25);
     this.setCorrectButtonsInteractive(false);
     this.setPassButtonState(false);
-    this.passCooldown = this.scene.time.addEvent({
-      delay: 3000,
-      callback: () => {
-        this.passCooldown = undefined;
-        this.showNextCategoryImage();
-        if (this.battleState) {
-          this.setCorrectButtonsInteractive(true);
-          this.setPassButtonState(true);
-        }
-      },
+    this.deps.categoryImages.showCurrentName(3000, () => {
+      this.showNextCategoryImage();
+      if (this.battleState) {
+        this.setCorrectButtonsInteractive(true);
+        this.setPassButtonState(true);
+      }
     });
   }
 
