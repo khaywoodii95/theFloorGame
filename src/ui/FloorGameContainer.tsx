@@ -15,10 +15,10 @@ export function FloorGameContainer() {
   const computeCanvasSize = useCallback(() => {
     if (typeof window === "undefined") return 600;
     // leave room for header/status/controls while keeping things centered
-    const usableHeight = Math.max(260, window.innerHeight - 240);
+    const usableHeight = Math.max(260, window.innerHeight - 280);
     const usableWidth = Math.max(260, window.innerWidth - 40);
     const base = Math.min(usableHeight, usableWidth);
-    return Math.max(300, Math.min(700, base));
+    return Math.max(300, Math.min(800, base));
   }, []);
   const [canvasSize, setCanvasSize] = useState<number>(() => computeCanvasSize());
 

@@ -19,6 +19,7 @@ export class CategoryImageManager {
 
   start(category: string) {
     this.currentCategory = category;
+    this.emitHostDialogUpdate();
     const width = Number(this.scene.scale.width) || 600;
     const height = Number(this.scene.scale.height) || 600;
     if (!this.fade) {
@@ -51,6 +52,7 @@ export class CategoryImageManager {
     this.previousName = this.currentName;
     this.currentName = this.getNameFromPath(pick);
     this.placeImage(pick);
+    this.emitHostDialogUpdate();
   }
 
   clear() {
@@ -65,6 +67,7 @@ export class CategoryImageManager {
     this.currentCategory = null;
     this.currentName = null;
     this.previousName = null;
+    this.emitHostDialogUpdate();
     if (this.fade) {
       this.fade.setVisible(false);
     }
@@ -143,5 +146,19 @@ export class CategoryImageManager {
     this.currentName = null;
     this.previousName = null;
     this.used = {};
+    this.emitHostDialogUpdate();
+  }
+
+  private emitHostDialogUpdate() {
+    if (typeof window === "undefined") return;
+    window.dispatchEvent(
+      new CustomEvent("hostAnswerDialogUpdate", {
+        detail: {
+          name: this.currentName,
+          previousName: this.previousName,
+          category: this.currentCategory,
+        },
+      })
+    );
   }
 }

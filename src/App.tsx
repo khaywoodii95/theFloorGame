@@ -1,8 +1,16 @@
 import "./App.css";
 import { useEffect, useState } from "react";
 import { FloorGameContainer } from "./ui/FloorGameContainer";
+import { HostAnswerDialogToggle, HostAnswerDialog } from "./ui/HostAnswerDialog";
+import { isHostDialogWindow } from "./ui/hostDialogUtils";
 
 function App() {
+  const isHostWindow = typeof window !== "undefined" && isHostDialogWindow();
+
+  if (isHostWindow) {
+    return <HostAnswerDialog />;
+  }
+
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [statusTitle, setStatusTitle] = useState<string>("Ready");
   const [statusHint, setStatusHint] = useState<string>("Click Random Battle to begin.");
@@ -25,6 +33,17 @@ function App() {
     };
     window.addEventListener("gameStatusChanged", handler);
     return () => window.removeEventListener("gameStatusChanged", handler);
+  }, []);
+
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const custom = event as CustomEvent<{ name: string | null; previousName?: string | null; category?: string | null }>;
+      if (typeof window !== "undefined" && window.electron?.ipcRenderer) {
+        window.electron.ipcRenderer.send("hostDialog:update", custom.detail);
+      }
+    };
+    window.addEventListener("hostAnswerDialogUpdate", handler);
+    return () => window.removeEventListener("hostAnswerDialogUpdate", handler);
   }, []);
 
   return (
@@ -99,6 +118,7 @@ function App() {
         </div>
       </div>
       <FloorGameContainer />
+      <HostAnswerDialogToggle />
     </div>
   );
 }

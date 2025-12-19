@@ -92,6 +92,7 @@ export class BattleController {
 
   handleCorrectHotkey() {
     if (!this.battleState || this.battleState.timerEvent.paused) return;
+    if (this.passCooldown) return; // block correct hotkey during pass penalty
     if (this.battleState.active === "attacker") {
       this.markCorrect("attacker");
     } else if (this.battleState.active === "defender") {
@@ -101,6 +102,7 @@ export class BattleController {
 
   handlePassHotkey() {
     if (!this.battleState || this.battleState.timerEvent.paused) return;
+    if (this.passCooldown) return; // ignore pass while penalty active
     this.handlePass();
   }
 
@@ -247,15 +249,20 @@ export class BattleController {
   private handlePass() {
     if (!this.battleState) return;
     if (this.passCooldown) return;
+    const penaltyMs = 3000;
     this.deps.playTone(180, 200, 0.25);
     this.setCorrectButtonsInteractive(false);
     this.setPassButtonState(false);
-    this.deps.categoryImages.showCurrentName(3000, () => {
-      this.showNextCategoryImage();
+    this.passCooldown = this.scene.time.delayedCall(penaltyMs, () => {
+      this.passCooldown = undefined;
       if (this.battleState) {
         this.setCorrectButtonsInteractive(true);
         this.setPassButtonState(true);
       }
+    });
+
+    this.deps.categoryImages.showCurrentName(penaltyMs, () => {
+      this.showNextCategoryImage();
     });
   }
 

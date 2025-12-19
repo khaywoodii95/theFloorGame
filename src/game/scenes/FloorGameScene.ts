@@ -266,7 +266,7 @@ export class FloorGameScene extends Phaser.Scene {
   }
 
   private startRandomBattle() {
-    if (this.battleController?.isActive() || this.mode === "chooseCategory" || this.randomizer?.isRunning())
+    if (this.battleController?.isActive() || this.mode === "chooseCategory" || this.mode === "finalReady" || this.randomizer?.isRunning())
       return;
 
     const aliveIds = this.getAlivePlayerIds();
@@ -712,6 +712,7 @@ export class FloorGameScene extends Phaser.Scene {
       return;
     }
 
+    this.stopRandomizerAudio();
     this.pendingDirectBattle = {
       attackerTile: pair.attackerTile,
       defenderTile: pair.defenderTile,

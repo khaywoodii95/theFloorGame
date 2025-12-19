@@ -17,6 +17,9 @@ const FALLBACK_CATEGORIES = [
   "African Geography",
   "Thanksgiving",
   "Black Music Artists",
+  "Nickelodeon Shows",
+  "Hair Care Brands",
+  "Disney Characters",
 ];
 
 Object.entries(globResult).forEach(([path, mod]) => {
